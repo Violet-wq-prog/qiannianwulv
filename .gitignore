@@ -1,0 +1,8 @@
+.env
+__pycache__/
+*.pyc
+data/*.db
+assets/photos/*
+.smoke_tmp/
+.streamlit/secrets.toml
+submission/

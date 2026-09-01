@@ -1,0 +1,8 @@
+streamlit>=1.51
+openai>=1.40
+python-dotenv>=1.0
+Pillow>=10.0
+pydeck>=0.9
+edge-tts>=7.2.8,<8
+# 分享卡片真二维码（未安装时自动降级为图案二维码）
+qrcode>=7.4
