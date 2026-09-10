@@ -13,7 +13,7 @@ from core.asr import render_audio_input
 from core.data_loader import enrich_entries, get_person, get_place, person_entries_in_city
 from core.prompt_templates import build_site_messages
 from core.scripts import offline_site_reply
-from views.common import button_row, goto, render_speaker, scroll_to_bottom, stamp_html, stream_or_fallback
+from views.common import context_header, button_row, goto, render_speaker, scroll_to_bottom, stamp_html, stream_or_fallback
 
 
 def render():
@@ -40,6 +40,8 @@ def render():
                 f"{'✅ 已打卡' if t['site_unlocked'][i] else '🔒 未打卡'}")
     if place:
         st.markdown('<div class="qn-quote">' + place["intro"] + "</div>", unsafe_allow_html=True)
+
+    context_header(f'{person["name"]} · {site["place_name"]}', f'{route["city"]} · 第{site["day"]}天 · 故地重游')
 
     # 对话区
     for m in t["site_dialog"]:

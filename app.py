@@ -44,6 +44,8 @@ _VIEW_MODULES = {
 
 def _render_page(page: Page):
     mod = _VIEW_MODULES.get(page, "home")
+    from views.common import travel_steps
+    travel_steps(page)
     importlib.import_module(f"views.{mod}").render()
 
 
@@ -71,18 +73,20 @@ def _sidebar():
             st.markdown("---")
 
         # 导航用无状态按钮：radio 的自身状态会与程序化跳页互相覆盖，导致页面被弹回首页
-        nav_items = [(Page.HOME, "🏠 首页"), (Page.EXPLORE, "🗺️ 开启游历"),
-                     (Page.CHAT_SOLO, "💬 单人闲谈"), (Page.CHAT_GROUP, "🎭 跨时代群聊"),
-                     (Page.ANCIENT_TEST, "🎯 古今人格测试"), (Page.ARCHIVE, "📚 游历档案")]
+        nav_groups = [
+            ("探索", [(Page.HOME, "🏠 首页"), (Page.EXPLORE, "🗺️ 开启游历")]),
+            ("与古人相遇", [(Page.CHAT_SOLO, "💬 单人闲谈"), (Page.CHAT_GROUP, "🎭 跨时代群聊")]),
+            ("我的", [(Page.ANCIENT_TEST, "🎯 古今人格测试"), (Page.ARCHIVE, "📚 游历档案")]),
+        ]
         current = state.current_page()
-        nav_cols = st.columns(2)
-        for idx, (pg, label) in enumerate(nav_items):
-            with nav_cols[idx % 2]:
-                kind = "primary" if pg == current else "secondary"
-                if st.button(label, key=f"sidebar_nav_{pg.value}", type=kind,
-                             width="stretch"):
-                    state.goto(pg)
-                    st.rerun()
+        for group, items in nav_groups:
+            st.caption(group)
+            for pg, label in items:
+                kind = "primary" if pg == Page.EXPLORE else "secondary"
+                with st.container(key=f"nav_{'active' if pg == current else 'item'}_{pg.value}"):
+                    if st.button(label, key=f"sidebar_nav_{pg.value}", type=kind, width="stretch"):
+                        state.goto(pg)
+                        st.rerun()
         st.markdown("---")
         if st.button("🔄 重新开始", key="sidebar_reset"):
             state.reset_travel()

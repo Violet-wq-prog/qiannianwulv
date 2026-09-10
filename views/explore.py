@@ -42,7 +42,7 @@ def render():
     st.markdown("#### 请选一位作为本次旅程的同行人物")
 
     for i, p in enumerate(people):
-        with st.container(border=True):
+        with st.container(key=f"person_card_explore_{p['id']}"):
             left, right = st.columns([1, 3])
             with left:
                 person_avatar(p["id"], width=110)

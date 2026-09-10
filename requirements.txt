@@ -1,4 +1,5 @@
-streamlit>=1.51
+# 云端与本轮全链路测试使用同一版本，避免未来自动升级造成组件/CSS 回归。
+streamlit==1.51.0
 openai>=1.40
 python-dotenv>=1.0
 Pillow>=10.0

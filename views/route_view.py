@@ -59,15 +59,20 @@ def render():
         st.info(st.session_state.pop("photo_hint"))
 
     st.markdown(f"## 🗺️ {route['route_name']}")
-    left, right = st.columns([1, 3])
-    with left:
-        person_avatar(person["id"], width=100)
-    with right:
-        st.markdown('<div class="qn-quote">' + route["preface"] + "</div>", unsafe_allow_html=True)
-        m1, m2, m3 = st.columns(3)
-        m1.metric("路线天数", f"{route['days']} 天")
-        m2.metric("已游站点", f"{done} / {n}")
-        m3.metric("同行人物", person["name"])
+    with st.container(key="person_card_route"):
+        left, right = st.columns([1, 3])
+        with left:
+            person_avatar(person["id"], width=100)
+        with right:
+            st.caption(f"{person['dynasty']} · {person['category']}")
+            with st.expander("同行人物 · 简介与引语"):
+                st.caption(person["brief"])
+                st.write(person["quote"])
+            st.markdown('<div class="qn-quote">' + route["preface"] + "</div>", unsafe_allow_html=True)
+            m1, m2, m3 = st.columns(3)
+            m1.metric("路线天数", f"{route['days']} 天")
+            m2.metric("已游站点", f"{done} / {n}")
+            m3.metric("同行人物", person["name"])
 
     # 双地图：画卷 SVG（古风）+ 实景交互地图（pydeck，点击站点直达对话）
     tab_paint, tab_real = st.tabs(["🖌 画卷地图", "🗺 实景地图"])
@@ -85,7 +90,7 @@ def render():
     st.markdown("---")
     st.markdown("#### 📍 成套路线站点")
     for i, s in enumerate(route["sites"]):
-        with st.container(border=True):
+        with st.container(key=f"timeline_{'done' if unlocked[i] else 'pending'}_{i}"):
             c1, c2, c3 = st.columns([1, 4.5, 1.4])
             with c1:
                 tag = st.markdown

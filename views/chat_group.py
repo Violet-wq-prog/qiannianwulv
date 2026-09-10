@@ -18,7 +18,7 @@ from core.asr import render_audio_input
 from core.data_loader import PEOPLE, build_index, get_person
 from core.prompt_templates import build_group_opening_messages, build_group_turn_messages
 from core.scripts import offline_group_turn
-from views.common import goto, render_speaker, scroll_to_bottom, typewriter
+from views.common import context_header, goto, render_speaker, scroll_to_bottom, typewriter
 
 
 def _concurrency() -> int:
@@ -78,6 +78,8 @@ def render():
                     unsafe_allow_html=True)
         return
     persons = [get_person(i) for i in active if get_person(i)]
+
+    context_header("、".join(p["name"] for p in persons), "跨时代群聊 · 同桌而谈")
 
     for m in msgs:
         speaker = m["speaker"]

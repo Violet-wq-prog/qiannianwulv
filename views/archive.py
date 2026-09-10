@@ -9,7 +9,7 @@ from config import PHOTO_DIR, Page
 from core import database, state
 from core.data_loader import get_person
 from core.svg_map import svg_wrap_html
-from views.common import goto
+from views.common import goto, context_header
 
 
 @st.cache_data(ttl=24 * 3600, show_spinner=False)
@@ -79,7 +79,7 @@ def render():
     persons = [get_person(pid) for pid in json.loads(trip["person_ids"])]
     person_names = "、".join(p["name"] for p in persons if p)
 
-    st.markdown(f"### {route['route_name']}")
+    context_header(route["route_name"], "山水留痕 · 一程一册")
     st.caption(f"地点：{trip['city']} · 同行人物：{person_names} · "
                f"模式：{'人物视角优先' if route['mode']=='person_lead' else '双向融合'} · {trip['created_at']}")
     st.markdown('<div class="qn-quote">' + route["preface"] + "</div>", unsafe_allow_html=True)
@@ -91,11 +91,12 @@ def render():
     m3.metric("随笔", len(database.get_journals(trip["id"])))
 
     # 地图点亮全景（响应式 SVG，移动端不溢出）
+    st.markdown('<div class="qn-chapter">壹 · 山水行迹</div>', unsafe_allow_html=True)
     st.html(svg_wrap_html(route, unlocked))
 
     st.markdown("#### 各站足迹")
     for i, s in enumerate(route["sites"]):
-        with st.container(border=True):
+        with st.container(key=f"timeline_{'done' if unlocked[i] else 'pending'}_archive_{i}"):
             done = s["place_id"] in unlocked_keys
             st.markdown(f"{'✅' if done else '🔒'} **第{s['day']}天·第{s['seq']}站 · {s['place_name']}**")
             st.caption(s["story"])
@@ -104,9 +105,12 @@ def render():
                 st.caption(f"打卡时间：{c['unlocked_at']}")
 
     if photos:
+        st.markdown('<div class="qn-chapter">贰 · 光影与纪念</div>', unsafe_allow_html=True)
         st.markdown("#### 📸 同游合影与纪念票根")
-        cols = st.columns(min(2, len(photos)))
-        for col, r in zip(cols, photos):
+        for index, r in enumerate(photos):
+            if index % 2 == 0:
+                cols = st.columns(min(2, len(photos) - index))
+            col = cols[index % len(cols)]
             path = PHOTO_DIR / r["file_path"]
             if path.exists():
                 col.image(str(path), width="stretch")  # 容器宽自适应，手机不溢出
@@ -115,9 +119,10 @@ def render():
 
     journals = database.get_journals(trip["id"])
     if journals:
+        st.markdown('<div class="qn-chapter">叁 · 纸上心事</div>', unsafe_allow_html=True)
         st.markdown("#### 📝 游历随笔")
         for r in journals:
-            with st.container(border=True):
+            with st.container(key=f"journal_entry_{r['id']}"):
                 st.write(r["content"])
                 st.caption(r["created_at"])
 

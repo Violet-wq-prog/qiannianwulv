@@ -13,7 +13,7 @@ from core.asr import render_audio_input
 from core.data_loader import PEOPLE, build_index, get_person, search_people
 from core.prompt_templates import build_poem_messages, build_solo_system
 from core.scripts import offline_poem, offline_solo_reply
-from views.common import goto, person_avatar, render_speaker, scroll_to_bottom, stream_or_fallback
+from views.common import context_header, goto, person_avatar, render_speaker, scroll_to_bottom, stream_or_fallback
 
 
 @st.cache_data(ttl=60 * 60 * 24, show_spinner=False)
@@ -62,16 +62,21 @@ def render():
     person = get_person(chosen)
     msgs = st.session_state[state.KEY_SOLO_MSGS].setdefault(chosen, [])
 
+    context_header(person["name"], f'{person["dynasty"]} · {person["category"]} · 与古人闲谈')
+
     # 开场白
     if not msgs:
         msgs.append({"role": "assistant", "content": person["self_talk"]})
 
-    left, right = st.columns([1, 3])
-    with left:
-        person_avatar(chosen, width=110)
-    with right:
-        st.markdown('<div class="qn-quote">' + person["quote"] + "</div>", unsafe_allow_html=True)
-        st.caption(f"{person['dynasty']} · {person['category']} · {person['lifespan']}")
+    with st.container(key="person_card_solo"):
+        left, right = st.columns([1, 3])
+        with left:
+            person_avatar(chosen, width=110)
+        with right:
+            st.markdown(f"### {person['name']}")
+            st.caption(person["brief"])
+            st.markdown('<div class="qn-quote">' + person["quote"] + "</div>", unsafe_allow_html=True)
+            st.caption(f"{person['dynasty']} · {person['category']} · {person['lifespan']}")
 
     for m in msgs:
         with st.chat_message(m["role"], avatar="🎭" if m["role"] == "assistant" else None):

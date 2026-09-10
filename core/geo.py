@@ -79,7 +79,7 @@ def render_gps_block() -> None:
         if near:
             place = get_place(near[0][0])
             st.success(
-                f"📍 距你最近的故地：**{place['name']}** · {near[1]:.0f} 公里"
+                f"📍 距你最近的故地：**{place['name']}** · {near[0][1]:.0f} 公里"
                 if place else f"📍 附近找到 {len(near)} 处故地"
             )
             others = "、".join(

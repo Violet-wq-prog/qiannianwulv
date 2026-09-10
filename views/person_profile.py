@@ -17,15 +17,16 @@ def render():
         st.rerun()
         return
 
-    left, right = st.columns([1, 3])
-    with left:
-        person_avatar(pid, width=170)
-    with right:
-        st.markdown(f"## {person['name']} · {person['lifespan']}")
-        st.markdown(f"**{person['dynasty']} · {person['category']}**")
-        st.markdown(f"性格：{person['personality']}")
-        st.markdown(f"爱好：{'、'.join(person['hobbies'])}")
-        st.markdown('<div class="qn-quote">「' + person["quote"] + "」</div>", unsafe_allow_html=True)
+    with st.container(key="person_card_profile"):
+        left, right = st.columns([1, 3])
+        with left:
+            person_avatar(pid, width=170)
+        with right:
+            st.markdown(f"## {person['name']} · {person['lifespan']}")
+            st.markdown(f"**{person['dynasty']} · {person['category']}**")
+            st.markdown(f"性格：{person['personality']}")
+            st.markdown(f"爱好：{'、'.join(person['hobbies'])}")
+            st.markdown('<div class="qn-quote">「' + person["quote"] + "」</div>", unsafe_allow_html=True)
 
     st.markdown("#### 生平")
     st.write(person["brief"])

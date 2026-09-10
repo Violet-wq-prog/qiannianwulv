@@ -53,9 +53,10 @@ def button_row(specs: list[dict]) -> None:
 
 def scroll_to_bottom() -> None:
     """聊天页渲染后滚动到底部（rerun 后浏览器滚动位置会回到顶部）。"""
-    st.html(
-        "<script>window.setTimeout(()=>window.scrollTo(0, document.body.scrollHeight), 120)</script>",
-        unsafe_allow_javascript=True,
+    st.components.v1.html(
+        "<script>window.setTimeout(()=>window.parent.scrollTo(0, "
+        "window.parent.document.body.scrollHeight), 120)</script>",
+        height=0,
     )
 
 
@@ -111,3 +112,40 @@ def goto(page, rerun: bool = True):
     state.goto(page)
     if rerun:
         st.rerun()
+
+
+def travel_steps(page):
+    """只展示当前阶段，不写入业务状态或替代原有路由。"""
+    from config import Page
+    steps = ["寻访故地", "选择人物", "偏好设置", "路线生成", "路线总览", "故地对话", "合影随笔", "游历档案"]
+    mapping = {Page.EXPLORE: 0, Page.PERSON_PROFILE: 1, Page.PREFERENCE: 2,
+               Page.ROUTE_GEN: 3, Page.ROUTE_VIEW: 4, Page.SITE_DIALOGUE: 5,
+               Page.PHOTO: 6, Page.JOURNAL: 6, Page.ARCHIVE: 7}
+    if page not in mapping:
+        return
+    current = mapping[page]
+    if page == Page.EXPLORE and st.session_state.get("explore_result_query"):
+        current = 1
+    items = []
+    for i, label in enumerate(steps):
+        cls = "current" if i == current else ("past" if i < current else "")
+        aria = ' aria-current="step"' if i == current else ""
+        items.append(f'<li class="{cls}"{aria}><span>{i + 1:02}</span>{label}</li>')
+    st.markdown('<ol class="qn-steps" aria-label="游历步骤">' + "".join(items) + "</ol>",
+                unsafe_allow_html=True)
+
+
+def person_card_content(person, width=110):
+    """人物卡片共用内容；操作按钮由各页面保留原处理逻辑。"""
+    from html import escape
+    person_avatar(person["id"], width=width)
+    st.markdown(f'<div class="qn-person-name">{escape(person["name"])}</div>', unsafe_allow_html=True)
+    st.caption(f'{person["dynasty"]} · {person["category"]}')
+    st.caption(person["brief"])
+    st.markdown('<div class="qn-quote">' + escape(person["quote"]) + '</div>', unsafe_allow_html=True)
+
+
+def context_header(title, subtitle=""):
+    from html import escape
+    st.markdown('<div class="qn-context"><strong>' + escape(title) + '</strong><small>' +
+                escape(subtitle) + '</small></div>', unsafe_allow_html=True)
