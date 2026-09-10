@@ -10,9 +10,9 @@ from views.common import goto, person_card_content
 
 def _render_hero() -> None:
     # 浏览器自行选择 WebP；不支持时加载 PNG，不把两张图塞进每次 rerun 消息。
-    from html import escape
-    base = st.get_option("server.baseUrlPath").strip("/")
-    image_root = escape(f"/{base}/app/static" if base else "/app/static", quote=True)
+    # 使用相对地址以兼容 Streamlit Community Cloud 的 ``~/+/`` 应用前缀；
+    # 以 ``/app/static`` 开头的绝对地址会落到外层鉴权路由，导致公开页图片失效。
+    image_root = "app/static"
     st.markdown(
         f"""
         <section class="qn-home-hero" aria-label="千年晤旅首页主视觉">
